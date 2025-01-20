@@ -1,0 +1,26 @@
+Instalando RabbitMQ: https://www.rabbitmq.com/docs/install-debian#apt-quick-start-cloudsmith
+
+=>https://www.rabbitmq.com/tutorials/tutorial-one-python
+
+Producing means nothing more than sending. A program that sends messages is a PRODUCER.
+
+A QUEUE is the name for the post box. Although messages flow through RabbitMQ and your applications, they can only be stored inside a queue. A queue is only bound by the host's memory & disk limits, it's essentially a LARGE MESSAGE BUFFER.
+
+Many PRODUCERS can send messages that go to one queue, and many CONSUMERS can try to receive data from one queue.
+
+NOTE: producer, consumer, and broker do not have to reside on the same host; indeed in most applications they don't. An application can be both a producer and consumer, too.
+
+Overall design will looks like: producer -> hello (queue) -> consumer
+
+Producer sends messages to the "hello" queue. The consumer receives messages from that queue
+
+Para testar os programas, rode primeiro: pip install -r requirements.txt
+Inicie o consumidor: python receive.py
+Inicie o produtor: python send.py
+
+* Coisas interessantes para estudar: 
+https://learncsdesigns.medium.com/message-oriented-middleware-rabbitmq-part-1-6f1faa858f46
+
+https://abas-erp.com/en/blog/rabbit-mq-user-friendly-messenger-enables-connection
+
+
