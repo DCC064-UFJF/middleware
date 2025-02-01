@@ -6,15 +6,16 @@ import time
 from paho.mqtt import client as mqtt_client
 
 
-broker = 'localhost'
+broker = 'localhost' # ip do broker
 port = 1883
 topic = "python/mqtt"
-# Generate a Client ID with the publish prefix.
-client_id = f'publish-{random.randint(0, 1000)}'
-username = 'admin1'
-password = 'admin1'
+client_id = f'publish-{random.randint(0, 1000)}' # gera um id de cliente aleatório.
+# nome e senha dos usuários do RabbitMQ
+username = 'guest'
+password = 'guest'
 
 def connect_mqtt():
+    # função callback para para informar o status de conexão com o broker. 
     def on_connect(client, userdata, flags, rc, *args):
         if rc == 0:
             print("Connected to MQTT Broker!")
@@ -28,12 +29,13 @@ def connect_mqtt():
     return client
 
 
+# Loop que envia mensagens a cada segundo para o tópico "/python/mqtt" e sai do loop após 10 mensagens.
 def publish(client):
     msg_count = 1
     while True:
         time.sleep(1)
         msg = f"messages: {msg_count}"
-        result = client.publish(topic, msg+"lucassss")
+        result = client.publish(topic, msg)
         # result: [0, 1]
         status = result[0]
         if status == 0:
@@ -41,7 +43,7 @@ def publish(client):
         else:
             print(f"Failed to send message to topic {topic}")
         msg_count += 1
-        if msg_count > 500:
+        if msg_count > 10:
             break
 
 

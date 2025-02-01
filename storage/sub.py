@@ -5,13 +5,14 @@ import random
 from paho.mqtt import client as mqtt_client
 
 
-broker = 'localhost'
+broker = 'localhost' # ip do broker
 port = 1883
 topic = "python/mqtt"
-# Generate a Client ID with the subscribe prefix.
-client_id = f'subscribe-{random.randint(0, 100)}'
-username = 'admin1'
-password = 'admin1'
+client_id = f'subscribe-{random.randint(0, 100)}'  # gera um id de subscriber aleatório.
+# nome e senha dos usuários do RabbitMQ
+print("My client id is: ", client_id)
+username = 'guest'
+password = 'guest'
 
 
 def connect_mqtt() -> mqtt_client:
@@ -28,7 +29,7 @@ def connect_mqtt() -> mqtt_client:
     client.connect(broker, port)
     return client
 
-
+# Cria a função callback chamada toda vez que o cliente recebe mensagens do broker MQTT.
 def subscribe(client: mqtt_client):
     def on_message(client, userdata, msg):
         print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
