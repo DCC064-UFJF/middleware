@@ -5,7 +5,7 @@ from utils import insert_db
 
 # realiza a conexão usando localhost como ip
 connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host='localhost'))
+    pika.ConnectionParameters(host='my-rabbit', port=5672))
 channel = connection.channel()
 
 # declara a fila com mesmo nome do publisher

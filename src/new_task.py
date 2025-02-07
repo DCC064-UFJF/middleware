@@ -5,14 +5,14 @@ from datetime import datetime
 
 # realiza conexão usando ip localhost
 connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host='localhost'))
+    pika.ConnectionParameters(host='my-rabbit'))
 channel = connection.channel()
 
 # declara uma filac chamada "task_queue"
 channel.queue_declare(queue='task_queue', durable=True)
 
 # emulando um sensor
-message = f"{datetime.now()},temperature,21"
+message = f"{datetime.now()},Balacobaco,21"
     
 # publica a mensagem
 channel.basic_publish(
