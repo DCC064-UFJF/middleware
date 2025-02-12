@@ -10,7 +10,7 @@ channel = connection.channel()
 
 # declara a fila com mesmo nome do publisher
 channel.queue_declare(queue='task_queue', durable=True)
-print(' [*] Waiting for messages. To exit press CTRL+C')
+print(' [*] Waiting for messages. To exit press CTRL+C') 
 
 # callback que será chamado quando ler uma mensagem
 def callback(ch, method, properties, body):
