@@ -15,9 +15,11 @@ docker network create minha-network
 ---
 
 ## 🗄️ Banco de Dados - MongoDB
-```sh
+<!-- ```sh
 docker run --name mongodb --network minha-network -p 27017:27017 -d mongodb/mongodb-community-server:latest
-```
+``` -->
+[Repositório BD](https://github.com/DCC064-UFJF/database)
+
 📌 **Documentação MongoDB**: [Instalação via Docker](https://www.mongodb.com/pt-br/docs/manual/tutorial/install-mongodb-community-with-docker/)
 
 ### 🖥️ Ferramenta Gráfica para MongoDB
@@ -38,18 +40,18 @@ docker run -d --hostname my-rabbit --network minha-network --name rabbit13 -p 80
 
 ### ✅ Usando Imagem Pronta (Docker Hub)
 ```sh
-docker run -d --name middleware --network minha-network -p 5000:5000 -v $(pwd)/src:/app/src lucasg4x/sd-middleware
+docker run -d --name middleware-prod --network src_mongo_network -p 5001:5000 lucasg4x/sd-middleware
 ```
 
-### 📦 Usando Dockerfile Local
+### 📦 Usando Dockerfile Local (Somente em desenvolvimento)
 ```sh
-docker build -t flask-docker:latest .
-docker run -d --name middleware --network minha-network -p 5000:5000 -v $(pwd)/src:/app/src flask-docker
+docker build -t middleware-local:latest .
+docker run -d --name middleware-local --network src_mongo_network -p 5001:5000 -v $(pwd)/src:/app/src middleware-local
 ```
 
 ### 🌍 Acessar API
 ```
-http://localhost:5000/sensor/
+http://localhost:5001/sensor/
 ```
 
 ---
@@ -58,17 +60,17 @@ http://localhost:5000/sensor/
 
 ### 🎯 Rodar Worker (Supervisor já faz isso automaticamente!)
 ```sh
-docker exec -it middleware python src/worker.py
+docker exec -it middleware-local python src/worker.py
 ```
 
 ### 📝 Criar Nova Tarefa
 ```sh
-docker exec -it middleware python src/new_task.py
+docker exec -it middleware-local python src/new_task.py
 ```
 
 ### 🔄 Recriar Container Flask
 ```sh
-docker stop middleware && docker rm middleware && docker build -t lucasg4x/sd-middleware . && docker run -d --name flask --network minha-network -p 5000:5000 -v $(pwd)/src:/app/src lucasg4x/sd-middleware
+docker stop middleware-local && docker rm middleware-local && docker build -t lucasg4x/sd-middleware . && docker run -d --name flask --network minha-network -p 5000:5000 -v $(pwd)/src:/app/src lucasg4x/sd-middleware
 ```
 
 ### 📊 Verificar Status dos Workers
@@ -110,6 +112,9 @@ docker volume prune -f
 docker system prune -a --volumes -f
 ```
 
+docker login -u lucasg4x
+docker build -t lucasg4x/sd-middleware:1.0 .
+docker push lucasg4x/sd-middleware:1.0
 ---
 
 ## 🚀 Agora seu ambiente está pronto! 🔥
