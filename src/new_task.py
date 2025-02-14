@@ -2,6 +2,7 @@
 import pika
 import sys
 from datetime import datetime
+import json
 
 # realiza conexão usando ip localhost
 connection = pika.BlockingConnection(
@@ -12,13 +13,70 @@ channel = connection.channel()
 channel.queue_declare(queue='task_queue', durable=True)
 
 # emulando um sensor
-message = f"{datetime.now()},Balacobaco,21"
-    
+# circuitos = 
+# [
+#   {
+#     "id": 1,
+#     "sensor": [
+#       {
+#         "id_sensor": 1,
+#         "tipo": "Temperatura",
+#         "valores": [
+#             {"timestamp": 5, "valor": 5},
+#              {"timestamp": 5, "valor": 5},
+#               {"timestamp": 5, "valor": 5},
+#                {"timestamp": 5, "valor": 5}
+#         ]
+#       },
+#       {
+#         "id_sensor": 2,
+#         "timestamp": 287342323,
+#         "tipo": "Atuador",
+#         "valor": 0,
+#       }
+#     ]
+#   },
+#   {
+#     "id": 2,
+#     "sensor": [
+#       {
+#         "id_sensor": 1,
+#         "timestamp": 287342323,
+#         "tipo": "Temperatura",
+#         "valor": 37,
+#       }
+#     ]
+#   }
+# ]
+ 
+#  {
+#         "id_circuito":''
+#         "id_sensor": 1,
+#         "tipo": "Temperatura",
+#         "valor": 37,
+#         "timestamp": 287342323
+#       }
+ 
+ 
+
+dados_enviados_sensor = {
+    "_id": 2,
+    "sensor": 
+    {
+        "id_sensor": 1,
+        "timestamp": 287342323,
+        "tipo": "Temperatura",
+        "valor": 40,
+    }
+}
+
+message = json.dumps(dados_enviados_sensor).encode()
+
 # publica a mensagem
 channel.basic_publish(
     exchange='',
     routing_key='task_queue',
-    body=message.encode(),
+    body=message,
     properties=pika.BasicProperties(
         delivery_mode=pika.DeliveryMode.Persistent
     ))
