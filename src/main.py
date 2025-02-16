@@ -6,6 +6,8 @@ from http_server.controllers.actuator import actuator_blueprint
 from dotenv import load_dotenv
 from flask import Flask
 
+from utils import channel, connection
+
 load_dotenv()
 
 app: Flask = Flask(__name__)
@@ -19,3 +21,5 @@ def home():
   
 if __name__ == '__main__':
   app.run(host='0.0.0.0', port=5000, debug=getenv('FLASK_DEBUG', '1') == '1')
+
+  connection.close()
