@@ -1,86 +1,17 @@
 #!/usr/bin/env python
 import pika
 import time
-from utils import insert_db
 from database.connection import mongo_client
 import json
 
-# realiza a conexão usando localhost como ip
+# realiza a conexão
 connection = pika.BlockingConnection(
     # pika.ConnectionParameters(host='my-rabbit', port=5672))
     pika.ConnectionParameters(host='localhost', port=5672))
 channel = connection.channel()
 
+# CRIA BANCO DE DADOS CHAMADO "application", e cria coleções "circuitos", "sensores", "atuadores"
 db = mongo_client["application"]
-
-def create_sensor_collection():
-    validator = {
-        "$jsonSchema": {
-            "bsonType": "object",
-            "required": ["id", "tipo", "valor", "timestamp", "circuito_id"],
-            "properties": {
-                "id": {
-                    "bsonType": "int",
-                },
-                "tipo": {
-                    "bsonType": "string",
-                },
-                "valor": {
-                    "bsonType": "double",
-                },
-                "timestamp": {
-                    "bsonType": "string",
-                },
-                "circuito_id": {
-                    "bsonType": "int",
-                }
-            }
-        }
-    }
-
-    db.create_collection('sensores', validator=validator)
-    db['sensores'].create_index(['id', 'timestamp'], unique=True)
-
-def create_circuito_collection():
-    validator = {
-    "$jsonSchema": {
-            "bsonType": "object",
-            "required": ["id"],
-            "properties": {
-                "id": {
-                    "bsonType": "int",
-                }
-            }
-        }
-    }
-
-    db.create_collection('circuitos', validator=validator)
-    db['circuitos'].create_index(['id'], unique=True)
-
-def create_atuador_collection():
-    validator = {
-        "$jsonSchema": {
-            "bsonType": "object",
-            "required": ["id", "valor", "timestamp","circuito_id"],
-            "properties": {
-                "id": {
-                    "bsonType": "int",
-                },
-                "valor": {
-                    "bsonType": "int",
-                },
-                "timestamp": {
-                    "bsonType": "string",
-                },
-                "circuito_id": {
-                    "bsonType": "int",
-                }
-            }
-        }
-    }
-
-    db.create_collection('atuadores', validator=validator)
-    db['atuadores'].create_index(['id', 'timestamp'], unique=True)
 
 # declara a fila com mesmo nome do publisher
 channel.queue_declare(queue='task_queue', durable=True)
@@ -93,11 +24,13 @@ def callback(ch, method, properties, body):
 
     sensor_data = json.loads(msg)
     
+    # Se o valor de id do circuito ainda não foi inserido, ele será inserido com insert_one
     if not db['circuitos'].find_one({'id': sensor_data['id']}):
         db["circuitos"].insert_one({
             "id": sensor_data["id"]
         })
 
+    # Verifica se tipo é atuador, para inserir um atuador. Caso contrário, insere um sensor.
     if sensor_data["device"]["tipo"] == "atuador":
         db["atuadores"].insert_one({
             'id': sensor_data["device"]["id"],

@@ -3,8 +3,9 @@ import pika
 import sys
 from datetime import datetime
 import json
+import random
 
-# realiza conexão usando ip localhost
+# realiza conexão
 connection = pika.BlockingConnection(
     # pika.ConnectionParameters(host='my-rabbit'))
     pika.ConnectionParameters(host='localhost'))
@@ -13,60 +14,29 @@ channel = connection.channel()
 # declara uma filac chamada "task_queue"
 channel.queue_declare(queue='task_queue', durable=True)
 
-# emulando um sensor
-# circuitos = 
-# [
-#   {
-#     "id": 1,
-#     "sensor": [
-#       {
-#         "id_sensor": 1,
-#         "tipo": "Temperatura",
-#         "valores": [
-#             {"timestamp": 5, "valor": 5},
-#              {"timestamp": 5, "valor": 5},
-#               {"timestamp": 5, "valor": 5},
-#                {"timestamp": 5, "valor": 5}
-#         ]
-#       },
-#       {
-#         "id_sensor": 2,
-#         "timestamp": 287342323,
-#         "tipo": "Atuador",
-#         "valor": 0,
-#       }
-#     ]
-#   },
-#   {
-#     "id": 2,
-#     "sensor": [
-#       {
-#         "id_sensor": 1,
-#         "timestamp": 287342323,
-#         "tipo": "Temperatura",
-#         "valor": 37,
-#       }
-#     ]
-#   }
-# ]
- 
-#  {
-#         "id_circuito":''
-#         "id_sensor": 1,
-#         "tipo": "Temperatura",
-#         "valor": 37,
-#         "timestamp": 287342323
-#       }
- 
- 
+import random
 
+types = ["Temperatura", "Umidade", "Pressão", "atuador"]
+id_circuit = random.randint(1, 4)
+id_device = random.randint(1, 6)
+tipo = random.choice(types)
+
+if tipo == "atuador":
+    valor = random.randint(0, 1)
+else:
+    valor = random.uniform(30, 40)
+
+print(f"Tipo: {tipo}, Valor: {valor}")
+
+
+# FORMATO DOS DADOS DE ENVIO NA SIMULAÇÃO (!!!)
 dados_enviados_sensor = {
-    "id": 1,
+    "id": id_circuit,
     "device": 
     {
-        "id": 19,
-        "tipo": "TEMPERATURA",
-        "valor": 0,
+        "id": id_device,
+        "tipo": tipo,
+        "valor": valor,
         "timestamp": datetime.now().isoformat(),
     }
 }
