@@ -31,12 +31,12 @@ def send_task():
     Ao enviar uma requisição post, com o parâmetro new_value, envia o new_value para o broker
     """
     id_circuito = request.args.get('id_circuito')
-    id_sensor = request.args.get('id_sensor')
+    id_atuador = request.args.get('id_atuador')
     new_value = request.args.get('new_value')
 
     msg = {
         'id_circuito': id_circuito,
-        'id_sensor': id_sensor,
+        'id_atuador': id_atuador,
         'new_value': new_value
     }
 
