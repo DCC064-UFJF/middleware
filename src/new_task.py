@@ -6,7 +6,8 @@ import json
 
 # realiza conexão usando ip localhost
 connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host='my-rabbit'))
+    # pika.ConnectionParameters(host='my-rabbit'))
+    pika.ConnectionParameters(host='localhost'))
 channel = connection.channel()
 
 # declara uma filac chamada "task_queue"
@@ -60,13 +61,13 @@ channel.queue_declare(queue='task_queue', durable=True)
  
 
 dados_enviados_sensor = {
-    "_id": 2,
-    "sensor": 
+    "id": 1,
+    "device": 
     {
-        "id_sensor": 1,
-        "timestamp": 287342323,
-        "tipo": "Temperatura",
-        "valor": 40,
+        "id": 19,
+        "tipo": "TEMPERATURA",
+        "valor": 0,
+        "timestamp": datetime.now().isoformat(),
     }
 }
 
