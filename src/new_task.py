@@ -14,8 +14,6 @@ channel = connection.channel()
 # declara uma filac chamada "task_queue"
 channel.queue_declare(queue='task_queue', durable=True)
 
-import random
-
 types = ["Temperatura", "Umidade", "Pressão", "atuador"]
 id_circuit = random.randint(1, 4)
 id_device = random.randint(1, 6)
