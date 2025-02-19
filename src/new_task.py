@@ -29,12 +29,12 @@ print(f"Tipo: {tipo}, Valor: {valor}")
 
 # FORMATO DOS DADOS DE ENVIO NA SIMULAÇÃO (!!!)
 dados_enviados_sensor = {
-    "id": id_circuit,
+    "id": 1,
     "device": 
     {
-        "id": id_device,
-        "tipo": tipo,
-        "valor": valor,
+        "id": 1,
+        "tipo": "Teste",
+        "valor": 91.44,
         "timestamp": datetime.now().isoformat(),
     }
 }
