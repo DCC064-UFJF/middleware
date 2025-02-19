@@ -1,121 +1,182 @@
-# Trabalho Final de Sistemas Distribuídos (DCC064) - 2024.3
-
+# Configuração do Ambiente
 # 🚀 Setup do Ambiente com Docker
 
 ## 📌 Requisitos
 - Instalar **Docker**: [Download e instalação](https://www.docker.com/get-started)
 
 ---
+## Criar container do banco e do RabbitMQ
 
-## 🔹 Criar Rede Docker
 ```sh
 docker network create minha-network
 ```
-
----
-
 ## 🗄️ Banco de Dados - MongoDB
-<!-- ```sh
+```sh
 docker run --name mongodb --network minha-network -p 27017:27017 -d mongodb/mongodb-community-server:latest
-``` -->
-[Repositório BD](https://github.com/DCC064-UFJF/database)
-
-📌 **Documentação MongoDB**: [Instalação via Docker](https://www.mongodb.com/pt-br/docs/manual/tutorial/install-mongodb-community-with-docker/)
-
-### 🖥️ Ferramenta Gráfica para MongoDB
-- **MongoDB Compass (GUI)**: [Download](https://www.mongodb.com/try/download/compass)
-
----
-
+```
 ## 📨 Mensageria - RabbitMQ
 ```sh
 docker run -d --hostname my-rabbit --network minha-network --name rabbit13 -p 8080:15672 -p 5672:5672 -p 25676:25676 rabbitmq:3-management
 ```
-📌 **Tutorial RabbitMQ com Docker**: [Acesse aqui](https://medium.com/xp-inc/rabbitmq-com-docker-conhecendo-o-admin-cc81f3f6ac3b)
 
----
+### 🖥️ Ferramenta Gráfica para MongoDB
 
-## 🌐 Backend - Flask
-📌 **Tutorial sobre Flask com Docker**: [Leia mais](https://akiradev.netlify.app/posts/flask-docker/)
+- **MongoDB Compass (GUI)**: [Download](https://www.mongodb.com/try/download/compass)
 
-### ✅ Usando Imagem Pronta (Docker Hub)
+## Criar ambiente virtual
+
 ```sh
-docker run -d --name middleware-prod --network src_mongo_network -p 5001:5000 lucasg4x/sd-middleware
+python -m venv .venv
 ```
 
-### 📦 Usando Dockerfile Local (Somente em desenvolvimento)
+## Ativar ambiente virtual
+
+### Windows
 ```sh
-docker build -t middleware-local:latest .
-docker run -d --name middleware-local --network src_mongo_network -p 5001:5000 -v $(pwd)/src:/app/src middleware-local
+.venv\Scripts\activate
 ```
 
-### 🌍 Acessar API
-```
-http://localhost:5001/sensor/
-```
-
----
-
-## ⚙️ Workers e Tarefas
-
-### 🎯 Rodar Worker (Supervisor já faz isso automaticamente!)
+### Mac/Linux
 ```sh
-docker exec -it middleware-local python src/worker.py
+source .venv/bin/activate
 ```
 
-### 📝 Criar Nova Tarefa
+## Instalar as dependências do requirements.txt
+
 ```sh
-docker exec -it middleware-local python src/new_task.py
+pip install -r requirements.txt
 ```
 
-### 🔄 Recriar Container Flask
+## Subir os workers
+
 ```sh
-docker stop middleware-local && docker rm middleware-local && docker build -t lucasg4x/sd-middleware . && docker run -d --name flask --network minha-network -p 5000:5000 -v $(pwd)/src:/app/src lucasg4x/sd-middleware
+python src/worker.py
+python src/worker_actuator.py
 ```
 
-### 📊 Verificar Status dos Workers
+## Criar novas tarefas
+
 ```sh
-supervisorctl status
+python src/new_task.py
 ```
 
----
+# Documentação da API 
 
-## 🛠️ Comandos Úteis
+Esta API fornece acesso a informações sobre circuitos, sensores e atuadores. Abaixo estão descritas as rotas disponíveis, com exemplos de requisição e resposta.
 
-### 🛑 Parar Todos os Containers
-```sh
-docker stop $(docker ps -aq)
-```
+## Endpoints
 
-### 🗑️ Remover Todos os Containers
-```sh
-docker rm $(docker ps -aq)
-```
+### 1. Listar todos os circuitos
+- **Rota:** `GET /circuits`
+- **Descrição:** Retorna um array com os IDs dos circuitos existentes.
+- **Exemplo de requisição:**
+  ```http
+  GET http://localhost:5000/circuits
+  ```
+- **Exemplo de resposta:**
+  ```json
+  ["1", "2", "3"]
+  ```
 
-### 🖼️ Remover Todas as Imagens
-```sh
-docker rmi $(docker images -aq)
-```
+### 2. Listar dispositivos de um circuito
+- **Rota:** `GET /circuits/{circuit_id}/devices`
+- **Descrição:** Retorna todos os dados de sensores e atuadores de um determinado circuito.
+- **Exemplo de requisição:**
+  ```http
+  GET http://localhost:5000/circuits/1/devices
+  ```
+- **Exemplo de resposta:**
+  ```json
+  [
+    {
+    "circuito_id": 1,
+    "id": 6,
+    "timestamp": "2025-02-19T18:29:14.225767",
+    "tipo": "Pressao",
+    "valor": 34.0578674458435
+  },
+  {
+    "circuito_id": 1,
+    "id": 2,
+    "timestamp": "2025-02-19T18:29:16.403370",
+    "tipo": "Pressao",
+    "valor": 39.275676128273176
+  },
+  ]
+  ```
 
-### 🔗 Remover Redes Não Utilizadas
-```sh
-docker network prune -f
-```
+### 3. Obter o último valor de um sensor
+- **Rota:** `GET /circuits/{circuit_id}/sensor/{sensor_id}/last`
+- **Descrição:** Retorna o último valor registrado de um sensor de um circuito.
+- **Exemplo de requisição:**
+  ```http
+  GET http://localhost:5000/circuits/3/sensor/2/last
+  ```
+- **Exemplo de resposta:**
+  ```json
+  {
+  "circuito_id": 3,
+  "id": 2,
+  "timestamp": "2025-02-19T18:26:30.676066",
+  "tipo": "Pressao",
+  "valor": 36.32905832453196
+    }
+  ```
 
-### 💾 Remover Volumes Não Utilizados
-```sh
-docker volume prune -f
-```
+### 4. Obter o último valor de um atuador
+- **Rota:** `GET /circuits/{circuit_id}/actuator/{actuator_id}/last`
+- **Descrição:** Retorna o último valor registrado de um atuador de um circuito.
+- **Exemplo de requisição:**
+  ```http
+  GET http://localhost:5000/circuits/1/actuator/4/last
+  ```
+- **Exemplo de resposta:**
+  ```json
+  {
+  "circuito_id": 1,
+  "id": 4,
+  "timestamp": "2025-02-19T18:29:11.785804",
+  "valor": 1
+    }
+  ```
 
-### 🧹 Limpeza Completa (Containers, Imagens, Volumes, Redes)
-```sh
-docker system prune -a --volumes -f
-```
+### 5. Obter valores de um sensor em um período específico
+- **Rota:** `GET /circuits/{circuit_id}/sensor/{sensor_id}/all?start_date={start_date}&end_date={end_date}`
+- **Descrição:** Retorna todos os dados registrados de um sensor dentro de um período específico.
+- **Parâmetros:**
+  - `start_date` (string, obrigatório): Data e hora de início no formato ISO 8601 (ex: `2025-01-01T00:00:00`)
+  - `end_date` (string, obrigatório): Data e hora de fim no formato ISO 8601 (ex: `2025-02-31T23:59:59`)
+- **Exemplo de requisição:**
+  ```http
+  GET http://localhost:5000/circuits/3/sensor/2/all?start_date=2025-01-01T00:00:00&end_date=2025-02-31T23:59:59
+  ```
+- **Exemplo de resposta:**
+  ```json
+  [
+    {
+        "circuito_id": 3,
+        "id": 2,
+        "timestamp": "2025-02-19T18:26:30.676066",
+        "tipo": "Pressao",
+        "valor": 36.32905832453196
+    },
+    {
+        "circuito_id": 3,
+        "id": 2,
+        "timestamp": "2025-02-19T18:48:26.674557",
+        "tipo": "Pressao",
+        "valor": 31.264318936627966
+    }
+    ]
+  ```
 
-docker login -u lucasg4x
-docker build -t lucasg4x/sd-middleware:1.0 .
-docker push lucasg4x/sd-middleware:1.0
----
+- **Caso nenhum dado seja encontrado:**
+  ```json
+  {
+    "end_date": "2025-01-31T23:59:59",
+    "message": "No data found",
+    "start_date": "2025-01-01T00:00:00"
+    }
+  ```
 
-## 🚀 Agora seu ambiente está pronto! 🔥
 

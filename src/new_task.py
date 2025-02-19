@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import pika
-import sys
 from datetime import datetime
 import json
 import random
@@ -14,7 +13,7 @@ channel = connection.channel()
 # declara uma filac chamada "task_queue"
 channel.queue_declare(queue='task_queue', durable=True)
 
-types = ["Temperatura", "Umidade", "Pressão", "atuador"]
+types = ["Temperatura", "Umidade", "Pressao", "atuador"]
 id_circuit = random.randint(1, 4)
 id_device = random.randint(1, 6)
 tipo = random.choice(types)
@@ -29,12 +28,12 @@ print(f"Tipo: {tipo}, Valor: {valor}")
 
 # FORMATO DOS DADOS DE ENVIO NA SIMULAÇÃO (!!!)
 dados_enviados_sensor = {
-    "id": 1,
+    "id": 3,
     "device": 
     {
-        "id": 1,
-        "tipo": "Teste",
-        "valor": 91.44,
+        "id": 2,
+        "tipo": tipo,
+        "valor": valor,
         "timestamp": datetime.now().isoformat(),
     }
 }
