@@ -5,6 +5,13 @@
 - Instalar **Docker**: [Download e instalação](https://www.docker.com/get-started)
 
 ---
+
+## Criar arquivo .env a partir do exemplo
+```sh
+cp .env.example .env
+```
+
+
 ## Criar rede
 
 ```sh
@@ -14,16 +21,68 @@ docker network create minha-network
 ```sh
 docker run --name mongodb --network minha-network -p 27017:27017 -d mongodb/mongodb-community-server:latest
 ```
-## 📨 Mensageria - RabbitMQ
-```sh
-docker run -d --hostname my-rabbit --network minha-network --name rabbit13 -p 8080:15672 -p 5672:5672 -p 25676:25676 rabbitmq:3-management
-```
 
 ### 🖥️ Ferramenta Gráfica para MongoDB
 
 - **MongoDB Compass (GUI)**: [Download](https://www.mongodb.com/try/download/compass)
 
-## Criar ambiente virtual
+## 📨 Mensageria - RabbitMQ
+```sh
+docker run -d --hostname my-rabbit --network minha-network --name rabbit13 -p 8080:15672 -p 5672:5672 -p 25676:25676 rabbitmq:3-management
+```
+
+## 🌐 Backend - Flask
+
+<!-- ### ✅ Usando Imagem Pronta (Docker Hub)
+```sh
+docker run -d --name middleware-prod --network  minha-network -p 5001:5000 lucasg4x/sd-middleware
+``` -->
+
+### 📦 Usando Dockerfile Local
+```sh
+docker build -t middleware-local:latest .
+```
+```sh
+docker run -d --name middleware-local --network minha-network -p 5001:5000 -v $(pwd)/src:/app/src middleware-local
+```
+
+## ⚙️ Workers e Tarefas
+
+### 🎯 Rodar Workers (Supervisor já faz isso automaticamente!)
+```sh
+docker exec -it middleware-local python src/worker.py
+```
+
+### 📝 Criar Nova Tarefa
+```sh
+docker exec -it middleware-local python src/new_task.py
+```
+
+### 🔄 Recriar Container Flask
+```sh
+docker stop middleware-local && docker rm middleware-local
+```
+
+```sh
+docker build -t middleware-local:latest . && docker run -d --name middleware-local --network minha-network -p 5001:5000 -v $(pwd)/src:/app/src middleware-local
+```
+
+
+## 🛠️ Comandos Úteis
+
+### 🛑 Parar Todos os Containers
+```sh
+docker stop $(docker ps -aq)
+```
+
+### 🧹 Limpeza Completa (Containers, Imagens, Volumes, Redes)
+```sh
+docker system prune -a --volumes -f
+```
+
+
+
+<!-- ## Criar ambiente virtual
 
 ```sh
 python -m venv .venv
@@ -57,8 +116,10 @@ python src/worker_actuator.py
 ## Criar novas tarefas
 
 ```sh
-python src/new_task.py
-```
+python src/new_task.py 
+```-->
+
+
 
 # Documentação da API 
 
@@ -71,7 +132,7 @@ Esta API fornece acesso a informações sobre circuitos, sensores e atuadores. A
 - **Descrição:** Retorna um array com os IDs dos circuitos existentes.
 - **Exemplo de requisição:**
   ```http
-  GET http://localhost:5000/circuits
+  GET http://localhost:5001/circuits
   ```
 - **Exemplo de resposta:**
   ```json
@@ -83,7 +144,7 @@ Esta API fornece acesso a informações sobre circuitos, sensores e atuadores. A
 - **Descrição:** Retorna todos os dados de sensores e atuadores de um determinado circuito.
 - **Exemplo de requisição:**
   ```http
-  GET http://localhost:5000/circuits/1/devices
+  GET http://localhost:5001/circuits/1/devices
   ```
 - **Exemplo de resposta:**
   ```json
@@ -110,7 +171,7 @@ Esta API fornece acesso a informações sobre circuitos, sensores e atuadores. A
 - **Descrição:** Retorna o último valor registrado de um sensor de um circuito.
 - **Exemplo de requisição:**
   ```http
-  GET http://localhost:5000/circuits/3/sensor/2/last
+  GET http://localhost:5001/circuits/3/sensor/2/last
   ```
 - **Exemplo de resposta:**
   ```json
@@ -128,7 +189,7 @@ Esta API fornece acesso a informações sobre circuitos, sensores e atuadores. A
 - **Descrição:** Retorna o último valor registrado de um atuador de um circuito.
 - **Exemplo de requisição:**
   ```http
-  GET http://localhost:5000/circuits/1/actuator/4/last
+  GET http://localhost:5001/circuits/1/actuator/4/last
   ```
 - **Exemplo de resposta:**
   ```json
@@ -148,7 +209,7 @@ Esta API fornece acesso a informações sobre circuitos, sensores e atuadores. A
   - `end_date` (string, obrigatório): Data e hora de fim no formato ISO 8601 (ex: `2025-02-31T23:59:59`)
 - **Exemplo de requisição:**
   ```http
-  GET http://localhost:5000/circuits/3/sensor/2/all?start_date=2025-01-01T00:00:00&end_date=2025-02-31T23:59:59
+  GET http://localhost:5001/circuits/3/sensor/2/all?start_date=2025-01-01T00:00:00&end_date=2025-02-31T23:59:59
   ```
 - **Exemplo de resposta:**
   ```json
