@@ -4,10 +4,13 @@ from datetime import datetime
 import json
 import random
 
+from os import getenv
+from dotenv import load_dotenv
+load_dotenv()
+
 # realiza conexão
 connection = pika.BlockingConnection(
-    # pika.ConnectionParameters(host='my-rabbit'))
-    pika.ConnectionParameters(host='localhost'))
+    pika.ConnectionParameters(host=getenv('RABBIT_HOST', 'localhost'), port=getenv('RABBIT_PORT', 5672)))
 channel = connection.channel()
 
 # declara uma filac chamada "task_queue"

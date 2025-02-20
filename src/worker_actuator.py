@@ -3,10 +3,13 @@ import pika
 import time
 import json
 
+from os import getenv
+from dotenv import load_dotenv
+load_dotenv()
+
 # realiza a conexão
 connection = pika.BlockingConnection(
-    # pika.ConnectionParameters(host='my-rabbit', port=5672))
-    pika.ConnectionParameters(host='localhost', port=5672))
+    pika.ConnectionParameters(host=getenv('RABBIT_HOST', 'localhost'), port=getenv('RABBIT_PORT', 5672)))
 channel = connection.channel()
 
 channel.queue_declare(queue='actuators', durable=True)

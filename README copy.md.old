@@ -40,13 +40,13 @@ docker run -d --hostname my-rabbit --network minha-network --name rabbit13 -p 80
 
 ### ✅ Usando Imagem Pronta (Docker Hub)
 ```sh
-docker run -d --name middleware-prod --network src_mongo_network -p 5001:5000 lucasg4x/sd-middleware
+docker run -d --name middleware-prod --network  minha-network -p 5001:5000 lucasg4x/sd-middleware
 ```
 
 ### 📦 Usando Dockerfile Local (Somente em desenvolvimento)
 ```sh
 docker build -t middleware-local:latest .
-docker run -d --name middleware-local --network src_mongo_network -p 5001:5000 -v $(pwd)/src:/app/src middleware-local
+docker run -d --name middleware-local --network minha-network -p 5001:5000 -v $(pwd)/src:/app/src middleware-local
 ```
 
 ### 🌍 Acessar API

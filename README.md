@@ -5,7 +5,7 @@
 - Instalar **Docker**: [Download e instalação](https://www.docker.com/get-started)
 
 ---
-## Criar container do banco e do RabbitMQ
+## Criar rede
 
 ```sh
 docker network create minha-network
