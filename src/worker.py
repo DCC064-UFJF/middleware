@@ -38,6 +38,7 @@ def callback(ch, method, properties, body):
     if sensor_data["device"]["tipo"] == "atuador":
         db["atuadores"].insert_one({
             'id': sensor_data["device"]["id"],
+            'tipo': sensor_data["device"]["tipo"],
             'valor': sensor_data["device"]["valor"],
             'timestamp': sensor_data["device"]["timestamp"],
             'circuito_id': sensor_data["id"]

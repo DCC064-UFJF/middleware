@@ -68,6 +68,11 @@ docker exec -it middleware-local python src/worker.py
 docker exec -it middleware-local python src/new_task.py
 ```
 
+### 📊 Verificar Status dos Workers
+```sh
+docker exec -it middleware-local supervisorctl status
+```
+
 ---
 
 ## 🛠️ Comandos Úteis

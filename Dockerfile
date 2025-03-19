@@ -14,8 +14,8 @@ RUN apt-get install -y supervisor
 COPY . /app
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
 
-# ENTRYPOINT [ "python" ]
+ENTRYPOINT [ "python" ]
 
-# CMD [ "src/main.py" ]
+CMD [ "src/main.py" ]
